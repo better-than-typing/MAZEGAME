@@ -2,15 +2,21 @@
 
 #include <glad/glad.h>
 
+float planeVertices[36] = {
+    // first triangle
+    // positions          // colors
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
+     0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,
 
+    // second triangle
+    // positions          // colors
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
+    -0.5f, 0.0f,  -0.5f,  1.0f, 1.0f, 1.0f,
+};
 
 unsigned int registerPlane() {
-    float planeVertices[18] = {
-        // positions          // colors
-        -1.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f,
-         1.0f, 0.0f,  1.0f,  1.0f, 1.0f, 1.0f,
-         0.0f, 0.0f, -1.0f,  1.0f, 1.0f, 1.0f
-    };
 
     unsigned int VAO, VBO;
 
@@ -41,14 +47,20 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
     glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.Zoom), 1280.0f / 800.0f, 0.1f, 100.0f);
     glm::mat4 view = fpsCamera.GetViewMatrix();
 
+
+
+
     planeShader.setMat4("projection", projection);
     planeShader.setMat4("view", view);
 
+
     // world transformation
-    auto model = glm::mat4(1.0f);
+    glm::vec3 scale = glm::vec3(10.0f, 10.0f, 10.0f);
+    glm::mat4 model = glm::scale(glm::mat4(1.0f), scale);
+
     planeShader.setMat4("model", model);
 
     glBindVertexArray(planeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }

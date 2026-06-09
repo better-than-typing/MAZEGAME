@@ -17,7 +17,7 @@ float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 GLFWwindow* window;
-Camera fpsCamera(glm::vec3(0.0f, 0.5f, 0.5f));
+Camera fpsCamera(glm::vec3(0.0f, 0.5f, 0.0f));
 
 void initWindow();
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
