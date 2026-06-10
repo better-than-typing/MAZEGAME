@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "objects.h"
+
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
     FORWARD,
@@ -71,14 +73,20 @@ public:
         Position = glm::vec3(Position.x, 0.5f, Position.z);
 
         float velocity = MovementSpeed * deltaTime;
+
+        glm::vec3 nextPosition = Position;
+
         if (direction == FORWARD)
-            Position += Front * velocity;
+            nextPosition += Front * velocity;
         if (direction == BACKWARD)
-            Position -= Front * velocity;
+            nextPosition -= Front * velocity;
         if (direction == LEFT)
-            Position -= Right * velocity;
+            nextPosition -= Right * velocity;
         if (direction == RIGHT)
-            Position += Right * velocity;
+            nextPosition += Right * velocity;
+
+        if (!isCameraCollided(nextPosition))
+            Position = nextPosition;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

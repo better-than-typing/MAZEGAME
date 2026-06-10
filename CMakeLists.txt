@@ -11,6 +11,7 @@ add_executable(MAZEGAME main.cpp
         Headers/camera.h
         Headers/objects.h
         objects.cpp
+        collisions.cpp
 
 )
 

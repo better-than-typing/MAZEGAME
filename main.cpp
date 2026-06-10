@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include "Headers/shader.h"
-#include "Headers/camera.h"
 #include "Headers/objects.h"
+#include "Headers/camera.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
 constexpr unsigned int SCREEN_HEIGHT = 800;
@@ -27,7 +27,6 @@ int main() {
 
     initWindow();
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
-    registerPlane();
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -44,11 +43,11 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         unsigned int planeVAO = registerPlane();
+        unsigned int wallVAO = registerWall();
 
         drawPlane(planeVAO, planeShader, fpsCamera);
-
-
-
+        drawWall(wallVAO, planeShader, fpsCamera, glm::vec3(0.0f, 0.0f, -5.0f));
+        createWallCollision(0.0f, 0.0f, -5.0f, -5.0f);
 
         // Buffer and Input Event
         glfwSwapBuffers(window);
@@ -111,6 +110,8 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    //std::cout << fpsCamera.Position.x << ": " << fpsCamera.Position.z << std::endl;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         fpsCamera.ProcessKeyboard(FORWARD, deltaTime);
