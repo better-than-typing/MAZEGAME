@@ -23,9 +23,17 @@ void initWindow();
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void processInput(GLFWwindow *window);
 
+const glm::vec3 wallSize = glm::vec3(2.0f, 4.0f, 1.0f);
+const glm::vec3 wallPos1 = glm::vec3(0.0f, 0.0f, -5.0f);
+
 int main() {
 
     initWindow();
+
+    unsigned int planeVAO = registerPlane();
+    unsigned int wallVAO = registerWall();
+    createWallCollision(-(0.5f * wallSize.x), 0.5f * wallSize.x, wallPos1.z, wallPos1.z);
+
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
 
     while (!glfwWindowShouldClose(window)) {
@@ -42,22 +50,12 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.01f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        unsigned int planeVAO = registerPlane();
-        unsigned int wallVAO = registerWall();
-
         drawPlane(planeVAO, planeShader, fpsCamera);
-        drawWall(wallVAO, planeShader, fpsCamera, glm::vec3(0.0f, 0.0f, -5.0f));
-        createWallCollision(0.0f, 0.0f, -5.0f, -5.0f);
+        drawWall(wallVAO, planeShader, fpsCamera, wallPos1, wallSize);
 
         // Buffer and Input Event
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        // Escape Sequence
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwTerminate();
-            return 0;
-        }
     }
 
     glfwTerminate();
@@ -110,8 +108,6 @@ void processInput(GLFWwindow *window) {
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-    //std::cout << fpsCamera.Position.x << ": " << fpsCamera.Position.z << std::endl;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         fpsCamera.ProcessKeyboard(FORWARD, deltaTime);

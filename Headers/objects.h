@@ -18,7 +18,7 @@ unsigned int registerPlane();  // returns VAO so it can be reused
 void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera);
 
 unsigned int registerWall();
-void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::vec3 worldPos);
+void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec);
 
 void createWallCollision(float minX, float maxX, float minZ, float maxZ);
 bool isCameraCollided(glm::vec3 playerPos);

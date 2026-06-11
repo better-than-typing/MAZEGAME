@@ -85,8 +85,11 @@ public:
         if (direction == RIGHT)
             nextPosition += Right * velocity;
 
-        if (!isCameraCollided(nextPosition))
-            Position = nextPosition;
+        glm::vec3 xOnly = glm::vec3(nextPosition.x, Position.y, Position.z);
+        glm::vec3 zOnly = glm::vec3(Position.x,     Position.y, nextPosition.z);
+
+        if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
+        if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

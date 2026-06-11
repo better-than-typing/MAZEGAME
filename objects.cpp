@@ -100,7 +100,9 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
     glBindVertexArray(0);
 }
 
-void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::vec3 worldPos) {
+
+
+void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec) {
     wallShader.use();
 
     // view/projection transformations
@@ -111,9 +113,10 @@ void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::
     wallShader.setMat4("view", view);
 
     // world transformation
-    glm::vec3 scale = glm::vec3(2.0f, 4.0f, 1.0f);
-    glm::mat4 model = glm::scale(glm::mat4(1.0f), scale);
-    model = glm::translate(model, worldPos);
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), worldPos);
+    glm::vec3 scale = sizeVec;
+    model = glm::scale(model, scale);
 
     wallShader.setMat4("model", model);
 
