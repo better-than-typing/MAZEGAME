@@ -32,11 +32,16 @@ int main() {
 
     unsigned int planeVAO = registerPlane();
     unsigned int wallVAO = registerWall();
+
+    unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
+
     createWallCollision(-(0.5f * wallSize.x), 0.5f * wallSize.x, wallPos1.z, wallPos1.z);
 
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
 
     while (!glfwWindowShouldClose(window)) {
+
+        planeShader.use();
 
         // Frame Handling
         auto currentFrame = static_cast<float>(glfwGetTime());
@@ -50,6 +55,11 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.01f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Texture Objects
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, planeTexture);
+
+        // Draw Objects
         drawPlane(planeVAO, planeShader, fpsCamera);
         drawWall(wallVAO, planeShader, fpsCamera, wallPos1, wallSize);
 

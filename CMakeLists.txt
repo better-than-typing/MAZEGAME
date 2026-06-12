@@ -12,6 +12,8 @@ add_executable(MAZEGAME main.cpp
         Headers/objects.h
         objects.cpp
         collisions.cpp
+        stb_image.cpp
+        textures.cpp
 
 )
 

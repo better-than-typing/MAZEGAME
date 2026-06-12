@@ -14,6 +14,8 @@ struct Wall {
 
 class Camera;
 
+unsigned int loadTexture(char const * path);
+
 unsigned int registerPlane();  // returns VAO so it can be reused
 void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera);
 

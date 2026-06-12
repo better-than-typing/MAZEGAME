@@ -3,19 +3,19 @@
 
 #include <glad/glad.h>
 
-float planeVertices[36] = {
-    // first triangle
-    // positions          // colors
-    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
-     0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
-     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,
+// Was 36 floats (6 per vertex, no texcoords). Now 48 (8 per vertex).
+float planeVertices[48] = {
+    // positions          // colors          // texcoords
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+     0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 0.0f,
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 5.0f,
 
-    // second triangle
-    // positions          // colors
-     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,
-    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,
-    -0.5f, 0.0f,  -0.5f,  1.0f, 1.0f, 1.0f,
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 5.0f,
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
+    -0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 5.0f,
 };
+
+// Delete the old planeTexCoords array — it was never used
 
 float wallVertices[36] = {
     // first triangle
@@ -45,12 +45,16 @@ unsigned int registerPlane() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
 
     // Position Attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) nullptr);
     glEnableVertexAttribArray(0);
 
     // Color Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // Texture Coord Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     return VAO;
 }
