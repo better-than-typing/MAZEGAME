@@ -37,3 +37,19 @@ unsigned int loadTexture(char const * path)
 
     return textureID;
 }
+
+void setIcon(GLFWwindow* window) {
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\YesKing.png)", &width, &height, &channels, 4);
+
+    GLFWimage images[1];
+    images[0].width = width;
+    images[0].height = height;
+    images[0].pixels = pixels;
+
+    // Set the icon for your running window
+    glfwSetWindowIcon(window, 1, images);
+
+    // Free the image memory after setting
+    stbi_image_free(pixels);
+}

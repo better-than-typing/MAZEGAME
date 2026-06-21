@@ -14,6 +14,8 @@ add_executable(MAZEGAME main.cpp
         collisions.cpp
         stb_image.cpp
         textures.cpp
+        Headers/mazegen.h
+        Headers/mazegen.h
 
 )
 

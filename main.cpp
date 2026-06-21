@@ -23,7 +23,7 @@ void initWindow();
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void processInput(GLFWwindow *window);
 
-const glm::vec3 wallSize = glm::vec3(2.0f, 4.0f, 1.0f);
+const glm::vec3 wallSize = glm::vec3(2.0f, 3.0f, 1.0f);
 const glm::vec3 wallPos1 = glm::vec3(0.0f, 0.0f, -5.0f);
 
 int main() {
@@ -33,11 +33,20 @@ int main() {
     unsigned int planeVAO = registerPlane();
     unsigned int wallVAO = registerWall();
 
+    // Testing
+    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(6, 100.0f, glm::vec3(-50.0f, 0.0f, 50.0f));
+    unsigned int dotVAO = registerDot();
+
     unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
 
     createWallCollision(-(0.5f * wallSize.x), 0.5f * wallSize.x, wallPos1.z, wallPos1.z);
 
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
+    Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
+
+    for (glm::vec3 pos : worldPosDots) {
+        std::cout << "Dot: " << ": " << pos.x << ", " << pos.z << std::endl;
+    }
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -62,6 +71,10 @@ int main() {
         // Draw Objects
         drawPlane(planeVAO, planeShader, fpsCamera);
         drawWall(wallVAO, planeShader, fpsCamera, wallPos1, wallSize);
+
+        for (glm::vec3 pos : worldPosDots) {
+            drawDot(dotVAO, dotShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
+        }
 
         // Buffer and Input Event
         glfwSwapBuffers(window);
@@ -97,6 +110,7 @@ void initWindow() {
 
     glEnable(GL_DEPTH_TEST);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    setIcon(window);
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
@@ -128,3 +142,4 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         fpsCamera.ProcessKeyboard(RIGHT, deltaTime);
 }
+
