@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
+#include "Headers/mazegen.h"
+
 // Was 36 floats (6 per vertex, no texcoords). Now 48 (8 per vertex).
 float planeVertices[48] = {
     // positions          // colors          // texcoords
@@ -114,6 +116,7 @@ std::vector<glm::vec3> getDotsWorldPosVector(int dotNumberOneSided, float planeW
     }
 
     float dotPosInterval = planeWidthorLength / static_cast<float>(--dotNumberOneSided);
+    dotPosHalfInterval = dotPosInterval / 2.0f;
     int totalDots = dotNumberOneSided * dotNumberOneSided;
 
     float dotXCurrPos = planeBottomRightPoint.x;
@@ -237,7 +240,7 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
 
 
 
-void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec) {
+void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model) {
     wallShader.use();
 
     // view/projection transformations
@@ -246,12 +249,6 @@ void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, glm::
 
     wallShader.setMat4("projection", projection);
     wallShader.setMat4("view", view);
-
-    // world transformation
-
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), worldPos);
-    glm::vec3 scale = sizeVec;
-    model = glm::scale(model, scale);
 
     wallShader.setMat4("model", model);
 

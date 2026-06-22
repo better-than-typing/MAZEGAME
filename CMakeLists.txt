@@ -16,6 +16,7 @@ add_executable(MAZEGAME main.cpp
         textures.cpp
         Headers/mazegen.h
         Headers/mazegen.h
+        mazeGen.cpp
 
 )
 

@@ -5,6 +5,7 @@
 #include "Headers/shader.h"
 #include "Headers/objects.h"
 #include "Headers/camera.h"
+#include "Headers/mazegen.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
 constexpr unsigned int SCREEN_HEIGHT = 800;
@@ -23,8 +24,9 @@ void initWindow();
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void processInput(GLFWwindow *window);
 
-const glm::vec3 wallSize = glm::vec3(2.0f, 3.0f, 1.0f);
-const glm::vec3 wallPos1 = glm::vec3(0.0f, 0.0f, -5.0f);
+//TODO Make the GRID SIZE proportional to wall size or length
+glm::vec3 wallSize;
+glm::vec3 wallPos1;
 
 int main() {
 
@@ -34,7 +36,11 @@ int main() {
     unsigned int wallVAO = registerWall();
 
     // Testing
-    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(6, 100.0f, glm::vec3(-50.0f, 0.0f, 50.0f));
+    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(Maze::numDotsOnSide, 100.0f, glm::vec3(-50.0f, 0.0f, 50.0f));
+    std::vector<arrowIndex> initMazeIndicesVector = Maze::initMaze();
+    Maze::markNodes(initMazeIndicesVector);
+
+
     unsigned int dotVAO = registerDot();
 
     unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
@@ -45,8 +51,25 @@ int main() {
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
 
     for (glm::vec3 pos : worldPosDots) {
-        std::cout << "Dot: " << ": " << pos.x << ", " << pos.z << std::endl;
+       // std::cout << "Dot: " << ": " << pos.x << ", " << pos.z << std::endl;
     }
+
+    /**
+    int lineBreak = 0;
+    for (arrowIndex arrow_index : initMazeIndicesVector) {
+        std::cout << arrow_index.xI << ", " << arrow_index.zI << " [Pointed At: " << arrow_index.beingPointedAtX << ", " << arrow_index.beingPointedAtZ << " ] -> ";
+        std::cout << arrow_index.xF << ", " << arrow_index.zF << "\t";
+        lineBreak++;
+
+        if (lineBreak % Maze::numDotsOnSide == 0) {
+            std::cout << std::endl;
+            lineBreak = 0;
+        }
+    }
+    **/
+
+    std::cout << "Half Interval: " << dotPosHalfInterval << std::endl;
+    std::vector<Wall> wallVector = Maze::generateWalls(initMazeIndicesVector, worldPosDots);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -70,7 +93,16 @@ int main() {
 
         // Draw Objects
         drawPlane(planeVAO, planeShader, fpsCamera);
-        drawWall(wallVAO, planeShader, fpsCamera, wallPos1, wallSize);
+
+        //glm::vec3 testPos = worldPosDots[0];
+        //testPos.x = (worldPosDots[0].x - dotPosHalfInterval) * 0.1f;
+        //testPos.z *= 0.1f;
+        //drawWall(wallVAO, planeShader, fpsCamera, testPos, glm::vec3(1.0f, 3.0f, 1.0f));
+
+        for (Wall wall : wallVector) {
+            drawWall(wallVAO, planeShader, fpsCamera, wall.getModel());
+        }
+
 
         for (glm::vec3 pos : worldPosDots) {
             drawDot(dotVAO, dotShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
@@ -142,4 +174,3 @@ void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         fpsCamera.ProcessKeyboard(RIGHT, deltaTime);
 }
-

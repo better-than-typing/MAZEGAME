@@ -19,6 +19,7 @@ bool isCameraCollided(glm::vec3 playerPos) {
     }
 
     for (Wall wall : collisionWalls) {
+        //TODO MAGIC NUMBER
         if (abs(wall.minZ - playerPos.z) <= 0.15f &&
             playerPos.x <= wall.maxX &&
             playerPos.x >= wall.minX) {

@@ -5,13 +5,19 @@
 #ifndef MAZEGAME_MAZEGEN_H
 #define MAZEGAME_MAZEGEN_H
 
+#include <vector>
+#include <glm/vec3.hpp>
+
+#include "objects.h"
+
 struct origin {
-    int x, y;
+    int x, z;
 };
 
 struct arrowIndex {
-    int xI, xF, yI, yF;
-
+    int xI, xF, zI, zF;
+    bool beingPointedAtX = false;
+    bool beingPointedAtZ = false;
     /**
      *  ^
      *  |
@@ -24,5 +30,21 @@ struct arrowIndex {
      *  INDICES X GO FIRST
      */
 };
+
+namespace Maze {
+    // Recommended Odd Number
+    inline int numDotsOnSide = 5;
+
+    inline origin currentOrigin{numDotsOnSide - 1, numDotsOnSide - 1};
+    inline int originIndex = numDotsOnSide - 1;
+
+    std::vector<arrowIndex> initMaze();
+    std::vector<arrowIndex> shiftedMazeIndices(origin nextOrigin, std::vector<arrowIndex> prevMazeIndices);
+    std::vector<Wall> generateWalls(const std::vector<arrowIndex>& mazeIndicesVector, const std::vector<glm::vec3>& worldPosDots);
+    origin getRandomOrigin(const std::vector<arrowIndex>& mazeIndicesVector);
+
+    void generateMaze(int iterations);
+    void markNodes(std::vector<arrowIndex>& mazeIndices);
+}
 
 #endif //MAZEGAME_MAZEGEN_H
