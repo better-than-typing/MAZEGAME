@@ -16,8 +16,11 @@ struct origin {
 
 struct arrowIndex {
     int xI, xF, zI, zF;
-    bool beingPointedAtX = false;
-    bool beingPointedAtZ = false;
+
+    bool beingPointedFromUp = false;
+    bool beingPointedFromDown = false;
+    bool beingPointedFromLeft = false;
+    bool beingPointedFromRight = false;
     /**
      *  ^
      *  |
@@ -33,7 +36,7 @@ struct arrowIndex {
 
 namespace Maze {
     // Recommended Odd Number
-    inline int numDotsOnSide = 5;
+    inline int numDotsOnSide = 11;
 
     inline origin currentOrigin{numDotsOnSide - 1, numDotsOnSide - 1};
     inline int originIndex = numDotsOnSide - 1;
@@ -41,7 +44,7 @@ namespace Maze {
     std::vector<arrowIndex> initMaze();
     std::vector<arrowIndex> shiftedMazeIndices(origin nextOrigin, std::vector<arrowIndex> prevMazeIndices);
     std::vector<Wall> generateWalls(const std::vector<arrowIndex>& mazeIndicesVector, const std::vector<glm::vec3>& worldPosDots);
-    origin getRandomOrigin(const std::vector<arrowIndex>& mazeIndicesVector);
+    origin getRandomOrigin();
 
     void generateMaze(int iterations);
     void markNodes(std::vector<arrowIndex>& mazeIndices);

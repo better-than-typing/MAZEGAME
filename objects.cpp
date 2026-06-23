@@ -228,7 +228,7 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
 
 
     // world transformation
-    glm::vec3 scale = glm::vec3(10.0f, 1.0f, 10.0f);
+    glm::vec3 scale = glm::vec3(planeSize / 8.0f, 1.0f, planeSize / 8.0f);
     glm::mat4 model = glm::scale(glm::mat4(1.0f), scale);
 
     planeShader.setMat4("model", model);

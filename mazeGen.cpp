@@ -2,6 +2,7 @@
 // Created by EyesightsX on 2026-06-21.
 //
 
+#include <format>
 #include <random>
 
 #include "Headers/mazegen.h"
@@ -79,17 +80,17 @@ namespace Maze {
     std::vector<Wall> generateWalls(const std::vector<arrowIndex>& mazeIndicesVector, const std::vector<glm::vec3>& worldPosDots) {
         std::vector<Wall> wallsVector;
 
-
         int i = 0;
+
+        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 1.0f, 1.0f);
+
+
         for (arrowIndex arrowIndex : mazeIndicesVector) {
-            if (arrowIndex.xF != arrowIndex.xI || !arrowIndex.beingPointedAtX) {
-
-                glm::vec3 position = worldPosDots[i];
+            if (!arrowIndex.beingPointedFromUp && arrowIndex.zF - arrowIndex.zI <= 0) {
+                position = worldPosDots[i];
                 position.x *= 0.1f;
-                position.z = (position.z + dotPosHalfInterval) * 0.1f;
-
-                glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 3.0f, 1.0f);
-
+                position.z = (position.z - dotPosHalfInterval) * 0.1f;
 
                 Wall wall{worldPosDots[i].x - dotPosHalfInterval,
                     worldPosDots[i].x + dotPosHalfInterval,
@@ -99,20 +100,33 @@ namespace Maze {
 
                 wallsVector.push_back(wall);
             }
-
             i++;
         }
 
-        // TODO FIX ROTATION OR BAD POSITION?
+
+        for (int bottomI = 0; bottomI < numDotsOnSide; bottomI++) {
+            position = worldPosDots[bottomI];
+            position.x *= 0.1f;
+            position.z = (position.z + dotPosHalfInterval) * 0.1f;
+
+            Wall wall{worldPosDots[bottomI].x - dotPosHalfInterval,
+                worldPosDots[bottomI].x + dotPosHalfInterval,
+                worldPosDots[bottomI].z - dotPosHalfInterval,
+                worldPosDots[bottomI].z - dotPosHalfInterval,
+                position, size, glm::vec3(0.0f, 0.0f, 0.0f)};
+
+            wallsVector.push_back(wall);
+        }
+
+
+
         i = 0;
         for (arrowIndex arrowIndex : mazeIndicesVector) {
-            if (arrowIndex.zF != arrowIndex.zI || !arrowIndex.beingPointedAtZ) {
+            if (!arrowIndex.beingPointedFromRight && arrowIndex.xF - arrowIndex.xI <= 0) {
 
-                glm::vec3 position = worldPosDots[i];
-                position.z *= 0.1f;
+                position = worldPosDots[i];
+                position.z *= 0.1f; // TODO MAGIC NUMBER
                 position.x = (position.x + dotPosHalfInterval) * 0.1f;
-
-                glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 3.0f, 1.0f);
 
                 Wall wall{worldPosDots[i].x - dotPosHalfInterval,
                     worldPosDots[i].x + dotPosHalfInterval,
@@ -126,9 +140,23 @@ namespace Maze {
             i++;
         }
 
+        for (int leftI = 0; leftI < numDotsOnSide; leftI++) {
+            position = worldPosDots[leftI * numDotsOnSide];
+            position.z *= 0.1f; // TODO MAGIC NUMBER
+            position.x = (position.x - dotPosHalfInterval) * 0.1f;
+
+            Wall wall{worldPosDots[leftI * numDotsOnSide].x - dotPosHalfInterval,
+                worldPosDots[leftI * numDotsOnSide].x + dotPosHalfInterval,
+                worldPosDots[leftI * numDotsOnSide].z - dotPosHalfInterval,
+                worldPosDots[leftI * numDotsOnSide].z - dotPosHalfInterval,
+                position, size, glm::vec3(0.0f, 1.0f, 0.0f)};
+
+            wallsVector.push_back(wall);
+        }
 
         return wallsVector;
     }
+
 
     origin getRandomOrigin() {
         origin randomOrigin{currentOrigin.x, currentOrigin.z};
@@ -188,17 +216,38 @@ namespace Maze {
 
     void markNodes(std::vector<arrowIndex>& mazeIndices) {
         int nextVectorIndex = 0;
+
+        std::cout << "\n";
         for (arrowIndex index : mazeIndices) {
 
             if (index.xF != index.xI) {
                 nextVectorIndex = index.xF + index.zF * numDotsOnSide;
-                mazeIndices[nextVectorIndex].beingPointedAtX = true;
+
+                int dir = index.xF - index.xI;
+
+                if (dir < 0) {
+                    mazeIndices[nextVectorIndex].beingPointedFromRight = true;
+                } else if (dir > 0) {
+                    mazeIndices[nextVectorIndex].beingPointedFromLeft = true;
+                }
+
+            } else if (index.zF != index.zI) {
+                nextVectorIndex = index.xF + index.zF * numDotsOnSide;
+
+                int dir = index.zF - index.zI;
+
+                if (dir < 0) {
+                    mazeIndices[nextVectorIndex].beingPointedFromUp = true;
+                } else if (dir > 0) {
+                    mazeIndices[nextVectorIndex].beingPointedFromDown = true;
+                }
             }
 
-            if (index.zF != index.zI) {
-                nextVectorIndex = index.xF + index.zF * numDotsOnSide;
-                mazeIndices[nextVectorIndex].beingPointedAtZ = true;
-            }
+        }
+
+        for (arrowIndex index : mazeIndices) {
+            std::string s1 = std::format("Index: {}, {} -> {}, {} | From Right/Left[{}, {}] | From Down/Up[{}, {}]", index.xI, index.zI, index.xF, index.zF, index.beingPointedFromRight, index.beingPointedFromLeft, index.beingPointedFromDown, index.beingPointedFromUp);
+            std::cout << s1 << std::endl;
         }
     }
 }

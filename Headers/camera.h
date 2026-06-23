@@ -41,6 +41,8 @@ public:
     float MouseSensitivity;
     float Zoom;
 
+    bool flyMode = true;
+
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
@@ -70,7 +72,13 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         // Lock Character Y Axis
-        Position = glm::vec3(Position.x, 0.5f, Position.z);
+        // TODO Fly Mode = Position.y, FPS Mode = 0.5f for y position
+        if (flyMode) {
+            Position = glm::vec3(Position.x, Position.y + deltaTime, Position.z);
+        } else {
+            Position = glm::vec3(Position.x, 0.5f, Position.z);
+        }
+
 
         float velocity = MovementSpeed * deltaTime;
 

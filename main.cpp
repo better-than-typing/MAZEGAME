@@ -36,9 +36,15 @@ int main() {
     unsigned int wallVAO = registerWall();
 
     // Testing
-    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(Maze::numDotsOnSide, 100.0f, glm::vec3(-50.0f, 0.0f, 50.0f));
+    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(Maze::numDotsOnSide, planeSize, glm::vec3(-planeSize / 2.0f, 0.0f, planeSize / 2.0f));
     std::vector<arrowIndex> initMazeIndicesVector = Maze::initMaze();
-    Maze::markNodes(initMazeIndicesVector);
+
+    std::vector<arrowIndex> currArrowIndices = initMazeIndicesVector;
+    for (int i = 0; i < Maze::numDotsOnSide * Maze::numDotsOnSide * 10; i++) {
+        origin nextOrigin = Maze::getRandomOrigin();
+
+        currArrowIndices = Maze::shiftedMazeIndices(nextOrigin, currArrowIndices);
+    }
 
 
     unsigned int dotVAO = registerDot();
@@ -50,26 +56,27 @@ int main() {
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
 
-    for (glm::vec3 pos : worldPosDots) {
-       // std::cout << "Dot: " << ": " << pos.x << ", " << pos.z << std::endl;
-    }
 
-    /**
+    //std::cout << "Half Interval: " << dotPosHalfInterval << std::endl;
+    Maze::markNodes(currArrowIndices);
+    std::vector<Wall> wallVector = Maze::generateWalls(currArrowIndices, worldPosDots);
+
     int lineBreak = 0;
-    for (arrowIndex arrow_index : initMazeIndicesVector) {
-        std::cout << arrow_index.xI << ", " << arrow_index.zI << " [Pointed At: " << arrow_index.beingPointedAtX << ", " << arrow_index.beingPointedAtZ << " ] -> ";
-        std::cout << arrow_index.xF << ", " << arrow_index.zF << "\t";
+    for (arrowIndex arrow_index : currArrowIndices) {
+        std::cout << arrow_index.xI << ", " << arrow_index.zI << " -> ";
+        std::cout << arrow_index.xF << ", " << arrow_index.zF << "   ";
         lineBreak++;
 
         if (lineBreak % Maze::numDotsOnSide == 0) {
             std::cout << std::endl;
+
             lineBreak = 0;
         }
     }
-    **/
 
-    std::cout << "Half Interval: " << dotPosHalfInterval << std::endl;
-    std::vector<Wall> wallVector = Maze::generateWalls(initMazeIndicesVector, worldPosDots);
+    for (Wall wall : wallVector) {
+        //createWallCollision(-(0.5f * wall.size.x), 0.5f * wall.size.x, 0.0f, 0.0f);
+    }
 
     while (!glfwWindowShouldClose(window)) {
 

@@ -34,6 +34,7 @@ struct Wall {
 };
 
 inline float dotPosHalfInterval = 0;
+inline float planeSize = 200.0f;
 
 class Camera;
 
