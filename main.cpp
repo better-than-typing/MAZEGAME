@@ -2,10 +2,16 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+
+#include "External Headers/imgui.h"
+#include "External Headers/imgui_impl_glfw.h"
+#include "External Headers/imgui_impl_opengl3.h"
 #include "Headers/shader.h"
 #include "Headers/objects.h"
 #include "Headers/camera.h"
 #include "Headers/mazegen.h"
+#include "Headers/input.h"
+#include "Headers/debug.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
 constexpr unsigned int SCREEN_HEIGHT = 800;
@@ -31,54 +37,25 @@ glm::vec3 wallPos1;
 int main() {
 
     initWindow();
+    interfaceInit(window);
 
     unsigned int planeVAO = registerPlane();
     unsigned int wallVAO = registerWall();
-
-    // Testing
-    std::vector<glm::vec3> worldPosDots = getDotsWorldPosVector(Maze::numDotsOnSide, planeSize, glm::vec3(-planeSize / 2.0f, 0.0f, planeSize / 2.0f));
-    std::vector<arrowIndex> initMazeIndicesVector = Maze::initMaze();
-
-    std::vector<arrowIndex> currArrowIndices = initMazeIndicesVector;
-    for (int i = 0; i < Maze::numDotsOnSide * Maze::numDotsOnSide * 10; i++) {
-        origin nextOrigin = Maze::getRandomOrigin();
-
-        currArrowIndices = Maze::shiftedMazeIndices(nextOrigin, currArrowIndices);
-    }
-
-
     unsigned int dotVAO = registerDot();
 
     unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
 
-    createWallCollision(-(0.5f * wallSize.x), 0.5f * wallSize.x, wallPos1.z, wallPos1.z);
-
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
 
-
-    //std::cout << "Half Interval: " << dotPosHalfInterval << std::endl;
-    Maze::markNodes(currArrowIndices);
-    std::vector<Wall> wallVector = Maze::generateWalls(currArrowIndices, worldPosDots);
-
-    int lineBreak = 0;
-    for (arrowIndex arrow_index : currArrowIndices) {
-        std::cout << arrow_index.xI << ", " << arrow_index.zI << " -> ";
-        std::cout << arrow_index.xF << ", " << arrow_index.zF << "   ";
-        lineBreak++;
-
-        if (lineBreak % Maze::numDotsOnSide == 0) {
-            std::cout << std::endl;
-
-            lineBreak = 0;
-        }
-    }
-
-    for (Wall wall : wallVector) {
-        //createWallCollision(-(0.5f * wall.size.x), 0.5f * wall.size.x, 0.0f, 0.0f);
-    }
+    Maze::generateMaze();
 
     while (!glfwWindowShouldClose(window)) {
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow(); // Show demo window! :)
 
         planeShader.use();
 
@@ -89,6 +66,7 @@ int main() {
 
         // Input
         processInput(window);
+        togglePathCubes(window);
 
         // Background
         glClearColor(0.0f, 0.0f, 0.01f, 1.0f);
@@ -101,25 +79,27 @@ int main() {
         // Draw Objects
         drawPlane(planeVAO, planeShader, fpsCamera);
 
-        //glm::vec3 testPos = worldPosDots[0];
-        //testPos.x = (worldPosDots[0].x - dotPosHalfInterval) * 0.1f;
-        //testPos.z *= 0.1f;
-        //drawWall(wallVAO, planeShader, fpsCamera, testPos, glm::vec3(1.0f, 3.0f, 1.0f));
-
         for (Wall wall : wallVector) {
             drawWall(wallVAO, planeShader, fpsCamera, wall.getModel());
         }
 
-
-        for (glm::vec3 pos : worldPosDots) {
-            drawDot(dotVAO, dotShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
+        if (cubePathShown) {
+            for (glm::vec3 pos : worldPosDots) {
+                drawDot(dotVAO, dotShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
+            }
         }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Buffer and Input Event
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
@@ -140,7 +120,7 @@ void initWindow() {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -148,7 +128,7 @@ void initWindow() {
     }
 
     glEnable(GL_DEPTH_TEST);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
     setIcon(window);
 }
 

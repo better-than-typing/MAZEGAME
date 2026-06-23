@@ -1,5 +1,5 @@
-#include "Headers/objects.h"
-#include "Headers/stb_image.h"
+#include "../Headers/objects.h"
+#include "../External Headers/stb_image.h"
 
 unsigned int loadTexture(char const * path)
 {

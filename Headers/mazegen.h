@@ -36,7 +36,7 @@ struct arrowIndex {
 
 namespace Maze {
     // Recommended Odd Number
-    inline int numDotsOnSide = 11;
+    inline int numDotsOnSide = 5;
 
     inline origin currentOrigin{numDotsOnSide - 1, numDotsOnSide - 1};
     inline int originIndex = numDotsOnSide - 1;
@@ -46,7 +46,7 @@ namespace Maze {
     std::vector<Wall> generateWalls(const std::vector<arrowIndex>& mazeIndicesVector, const std::vector<glm::vec3>& worldPosDots);
     origin getRandomOrigin();
 
-    void generateMaze(int iterations);
+    void generateMaze();
     void markNodes(std::vector<arrowIndex>& mazeIndices);
 }
 

@@ -5,7 +5,7 @@
 #ifndef MAZEGAME_OBJECTS_H
 #define MAZEGAME_OBJECTS_H
 
-#include "Headers/shader.h"
+#include "shader.h"
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
 
@@ -35,6 +35,12 @@ struct Wall {
 
 inline float dotPosHalfInterval = 0;
 inline float planeSize = 200.0f;
+
+constexpr float WALL_HALF_THICKNESS = 0.05f;
+
+inline std::vector<glm::vec3> worldPosDots;
+inline std::vector<Wall> wallVector;
+
 
 class Camera;
 

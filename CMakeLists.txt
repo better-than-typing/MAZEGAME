@@ -10,14 +10,27 @@ add_executable(MAZEGAME main.cpp
         Headers/shader.h
         Headers/camera.h
         Headers/objects.h
-        objects.cpp
-        collisions.cpp
-        stb_image.cpp
-        textures.cpp
+        World/objects.cpp
+        World/collisions.cpp
+        "External Headers/stb_image.cpp"
+        World/textures.cpp
         Headers/mazegen.h
         Headers/mazegen.h
-        mazeGen.cpp
-
+        World/mazeGen.cpp
+        Headers/input.h
+        Player/input.cpp
+        Player/input.cpp
+        Interface/debug.cpp
+        Headers/debug.h
+        "External Headers/stb_image.cpp"
+        "External Headers/imgui.cpp"
+        "External Headers/imgui_draw.cpp"
+        "External Headers/imgui_tables.cpp"
+        "External Headers/imgui_widgets.cpp"
+        "External Headers/imgui_demo.cpp"
+        "External Headers/imgui_impl_glfw.cpp"
+        "External Headers/imgui_impl_opengl3.cpp"
+        "External Headers/imgui_internal.h"
 )
 
 target_link_libraries(MAZEGAME PRIVATE

@@ -1,11 +1,11 @@
-#include "Headers/objects.h"
-#include "Headers/camera.h"
+#include "../Headers/objects.h"
+#include "../Headers/camera.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
 
-#include "Headers/mazegen.h"
+#include "../Headers/mazegen.h"
 
 // Was 36 floats (6 per vertex, no texcoords). Now 48 (8 per vertex).
 float planeVertices[48] = {

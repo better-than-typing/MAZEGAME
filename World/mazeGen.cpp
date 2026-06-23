@@ -5,7 +5,7 @@
 #include <format>
 #include <random>
 
-#include "Headers/mazegen.h"
+#include "../Headers/mazegen.h"
 
 namespace Maze {
     std::vector<arrowIndex> initMaze() {
@@ -191,27 +191,26 @@ namespace Maze {
     }
 
     //TODO Implement Random Walls
-    void generateMaze(int iterations) {
+    void generateMaze() {
 
-        std::vector<arrowIndex> initArrowIndices = initMaze();
-        //std::cout << "Origin: " << currentOrigin.x << ", " << currentOrigin.y << std::endl;
+        // Testing
+        worldPosDots = getDotsWorldPosVector(numDotsOnSide, planeSize, glm::vec3(-planeSize / 2.0f, 0.0f, planeSize / 2.0f));
+        std::vector<arrowIndex> initMazeIndicesVector = initMaze();
 
-        std::vector<arrowIndex> currArrowIndices = initArrowIndices;
-
-        //std::cout << "Current Origin: " << currentOrigin.x << ", " << currentOrigin.y << std::endl;
-
-
-        //TODO Generate Later!!!
-        /*
-        for (int i = 0; i < iterations; i++) {
+        std::vector<arrowIndex> currArrowIndices = initMazeIndicesVector;
+        for (int i = 0; i < numDotsOnSide * numDotsOnSide * 10; i++) {
             origin nextOrigin = getRandomOrigin();
 
-            std::vector<arrowIndex> nextArrowIndices = shiftedMazeIndices(nextOrigin, currArrowIndices);
-            currArrowIndices = nextArrowIndices;
-
-            //std::cout << "Current Origin: " << currentOrigin.x << ", " << currentOrigin.y << std::endl;
+            currArrowIndices = shiftedMazeIndices(nextOrigin, currArrowIndices);
         }
-        */
+
+        markNodes(currArrowIndices);
+        wallVector = generateWalls(currArrowIndices, worldPosDots);
+
+        // Wall Collisions
+        for (Wall wall : wallVector) {
+            createWallCollision(wall.minX, wall.maxX, wall.minZ, wall.maxZ);
+        }
     }
 
     void markNodes(std::vector<arrowIndex>& mazeIndices) {
@@ -245,10 +244,12 @@ namespace Maze {
 
         }
 
+        /**
         for (arrowIndex index : mazeIndices) {
             std::string s1 = std::format("Index: {}, {} -> {}, {} | From Right/Left[{}, {}] | From Down/Up[{}, {}]", index.xI, index.zI, index.xF, index.zF, index.beingPointedFromRight, index.beingPointedFromLeft, index.beingPointedFromDown, index.beingPointedFromUp);
             std::cout << s1 << std::endl;
         }
+        **/
     }
 }
 
