@@ -28,7 +28,7 @@ bool isCameraCollided(glm::vec3 playerPos) {
         float dz = playerPos.z - closestZ;
 
         if (dx * dx + dz * dz < PLAYER_RADIUS * PLAYER_RADIUS) {
-            std::cout << "Collided\n";
+            std::cout << "Collision from: " << playerPos.x << ", " << playerPos.z << std::endl;
             return true;
         }
     }

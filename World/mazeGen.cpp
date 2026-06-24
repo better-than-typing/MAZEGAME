@@ -190,7 +190,6 @@ namespace Maze {
         return randomOrigin;
     }
 
-    //TODO Implement Random Walls
     void generateMaze() {
 
         // Testing
@@ -209,7 +208,11 @@ namespace Maze {
 
         // Wall Collisions
         for (Wall wall : wallVector) {
-            createWallCollision(wall.minX, wall.maxX, wall.minZ, wall.maxZ);
+            createWallCollision(wall.minX / 10.0f, wall.maxX / 10.0f, wall.minZ / 10.0f, wall.maxZ / 10.0f);
+        }
+
+        for (glm::vec3 pos : worldPosDots) {
+            std::cout << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
         }
     }
 
@@ -243,13 +246,6 @@ namespace Maze {
             }
 
         }
-
-        /**
-        for (arrowIndex index : mazeIndices) {
-            std::string s1 = std::format("Index: {}, {} -> {}, {} | From Right/Left[{}, {}] | From Down/Up[{}, {}]", index.xI, index.zI, index.xF, index.zF, index.beingPointedFromRight, index.beingPointedFromLeft, index.beingPointedFromDown, index.beingPointedFromUp);
-            std::cout << s1 << std::endl;
-        }
-        **/
     }
 }
 

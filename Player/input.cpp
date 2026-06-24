@@ -17,3 +17,16 @@ void togglePathCubes(GLFWwindow *window) {
 
     spaceKeyWasPressed = spacePressedNow;
 }
+
+void toggleCursor(GLFWwindow *window) {
+    bool ctrlPressedNow = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS;
+
+    if (ctrlPressedNow && !ctrlWasPressedNow) {
+
+        cursorShown = !cursorShown;
+
+        std::cout << "Cursor Mode is " << cubePathShown << std::endl;
+    }
+
+    ctrlWasPressedNow = ctrlPressedNow;
+}

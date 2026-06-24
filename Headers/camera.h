@@ -12,7 +12,9 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Default camera values
@@ -24,6 +26,7 @@ const float ZOOM = 45.0f;
 
 constexpr float PLAYER_RADIUS = 0.2f;
 
+inline bool flyMode = true;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera {
@@ -41,8 +44,6 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
-
-    bool flyMode = true;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -75,12 +76,6 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
         // Lock Character Y Axis
         // TODO Fly Mode = Position.y, FPS Mode = 0.5f for y position
-        if (flyMode) {
-            Position = glm::vec3(Position.x, Position.y + deltaTime, Position.z);
-        } else {
-            Position = glm::vec3(Position.x, 0.5f, Position.z);
-        }
-
 
         float velocity = MovementSpeed * deltaTime;
 
@@ -94,9 +89,22 @@ public:
             nextPosition -= Right * velocity;
         if (direction == RIGHT)
             nextPosition += Right * velocity;
+        if (direction == UP)
+            nextPosition += WorldUp * velocity;
+        if (direction == DOWN)
+            nextPosition -= WorldUp * velocity;
+
+
 
         glm::vec3 xOnly = glm::vec3(nextPosition.x, Position.y, Position.z);
         glm::vec3 zOnly = glm::vec3(Position.x, Position.y, nextPosition.z);
+
+        if (flyMode) {
+            Position.y = nextPosition.y;
+        } else {
+            Position.y = 0.5f;
+        }
+
 
         if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
         if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;

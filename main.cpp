@@ -23,6 +23,8 @@ float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
 
+bool showDevUI = true;
+
 GLFWwindow* window;
 Camera fpsCamera(glm::vec3(0.0f, 0.5f, 0.0f));
 
@@ -48,14 +50,14 @@ int main() {
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
 
-    Maze::generateMaze();
-
+    //Maze::generateMaze();
     while (!glfwWindowShouldClose(window)) {
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow(); // Show demo window! :)
+
+        showDebugInterface(showDevUI, fpsCamera);
 
         planeShader.use();
 
@@ -67,6 +69,14 @@ int main() {
         // Input
         processInput(window);
         togglePathCubes(window);
+        toggleCursor(window);
+
+        // Debug
+        if (showWireframe) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         // Background
         glClearColor(0.0f, 0.0f, 0.01f, 1.0f);
@@ -120,7 +130,7 @@ void initWindow() {
     }
 
     glfwMakeContextCurrent(window);
-    //glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -128,11 +138,19 @@ void initWindow() {
     }
 
     glEnable(GL_DEPTH_TEST);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     setIcon(window);
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
+
+    if (cursorShown) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        return;
+    }
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     if (firstMouse) {
         lastX = xPos;
         lastY = yPos;
@@ -160,4 +178,8 @@ void processInput(GLFWwindow *window) {
         fpsCamera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         fpsCamera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        fpsCamera.ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        fpsCamera.ProcessKeyboard(DOWN, deltaTime);
 }

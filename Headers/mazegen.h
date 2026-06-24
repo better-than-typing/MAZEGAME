@@ -36,7 +36,7 @@ struct arrowIndex {
 
 namespace Maze {
     // Recommended Odd Number
-    inline int numDotsOnSide = 5;
+    inline int numDotsOnSide = 11;
 
     inline origin currentOrigin{numDotsOnSide - 1, numDotsOnSide - 1};
     inline int originIndex = numDotsOnSide - 1;
