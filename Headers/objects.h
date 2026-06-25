@@ -54,8 +54,8 @@ unsigned int registerWall();
 // void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera);
 void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model);
 
-unsigned int registerDot();
-void drawDot(unsigned int dotVAO, Shader& dotShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec);
+unsigned int registerCube();
+void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec);
 
 std::vector<glm::vec3> getDotsWorldPosVector(int dotNumberOneSided, float planeWidthorLength, glm::vec3 planeBottomRightPoint);
 

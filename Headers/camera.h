@@ -26,7 +26,7 @@ const float ZOOM = 45.0f;
 
 constexpr float PLAYER_RADIUS = 0.2f;
 
-inline bool flyMode = true;
+inline bool flyMode = false;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera {
@@ -105,9 +105,11 @@ public:
             Position.y = 0.5f;
         }
 
-
-        if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
-        if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
+        Position.x = nextPosition.x;
+        Position.z = nextPosition.z;
+        //TODO collision
+        //if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
+        //if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

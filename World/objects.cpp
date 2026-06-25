@@ -8,15 +8,16 @@
 #include "../Headers/mazegen.h"
 
 // Was 36 floats (6 per vertex, no texcoords). Now 48 (8 per vertex).
-float planeVertices[48] = {
-    // positions          // colors          // texcoords
-    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-     0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 0.0f,
-     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 5.0f,
+float texSize = planeSize / 10.0f;
+float planeVertices[66] = {
+    // positions          // colors          // texcoords                   // normals
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,                     0.0f, 1.0f, 0.0f,
+     0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f * texSize, 0.0f,           0.0f, 1.0f, 0.0f,
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f * texSize, 1.0f * texSize, 0.0f, 1.0f, 0.0f,
 
-     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  5.0f, 5.0f,
-    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 5.0f,
+     0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  1.0f * texSize, 1.0f * texSize, 0.0f, 1.0f, 0.0f,
+    -0.5f, 0.0f,  0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f,                     0.0f, 1.0f, 0.0f,
+    -0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f * texSize,           0.0f, 1.0f, 0.0f
 };
 
 float wallVertices[36] = {
@@ -82,7 +83,7 @@ const static std::vector<int> cubeIndices =
     23,21,22
 };
 
-unsigned int registerDot() {
+unsigned int registerCube() {
     unsigned int VAO, VBO, EBO;
 
     // VAO
@@ -155,16 +156,20 @@ unsigned int registerPlane() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
 
     // Position Attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*) nullptr);
     glEnableVertexAttribArray(0);
 
     // Color Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     // Texture Coord Attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    // Normals Attribute
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*) (8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
 
     return VAO;
 }
@@ -192,15 +197,15 @@ unsigned int registerWall() {
     return VAO;
 }
 
-void drawDot(unsigned int dotVAO, Shader& dotShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec) {
-    dotShader.use();
+void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec) {
+    cubeShader.use();
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.Zoom), 1280.0f / 800.0f, 0.1f, 100.0f);
     glm::mat4 view = fpsCamera.GetViewMatrix();
 
-    dotShader.setMat4("projection", projection);
-    dotShader.setMat4("view", view);
+    cubeShader.setMat4("projection", projection);
+    cubeShader.setMat4("view", view);
 
     // world transformation
 
@@ -208,10 +213,10 @@ void drawDot(unsigned int dotVAO, Shader& dotShader, Camera& fpsCamera, glm::vec
     glm::vec3 scale = sizeVec;
     model = glm::scale(model, scale);
 
-    dotShader.setMat4("model", model);
-    dotShader.setVec3("dotColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    cubeShader.setMat4("model", model);
+    cubeShader.setVec3("dotColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    glBindVertexArray(dotVAO);
+    glBindVertexArray(cubeVAO);
     glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
@@ -232,6 +237,11 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
     glm::mat4 model = glm::scale(glm::mat4(1.0f), scale);
 
     planeShader.setMat4("model", model);
+
+    //TODO MAGIC NUMBER
+    planeShader.setVec3("lightPos", glm::vec3(0.0f, 0.5f, 0.0f));
+    planeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    planeShader.setVec3("viewPos", fpsCamera.Position);
 
     glBindVertexArray(planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

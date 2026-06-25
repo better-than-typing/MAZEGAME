@@ -10,6 +10,6 @@
 inline bool showWireframe = false;
 
 void interfaceInit(GLFWwindow *window);
-void showDebugInterface(bool& showDevUI, Camera &playerCamera);
+void showDebugInterface(bool& showDevUI, Camera &playerCamera, float deltaTime);
 
 #endif //MAZEGAME_DEBUG_H

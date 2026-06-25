@@ -43,21 +43,24 @@ int main() {
 
     unsigned int planeVAO = registerPlane();
     unsigned int wallVAO = registerWall();
-    unsigned int dotVAO = registerDot();
+    unsigned int dotVAO = registerCube();
 
-    unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
+    unsigned int lightCubeVAO = registerCube();
+
+    unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\WoodFloor051_4K-PNG\WoodFloor051_4K-PNG_Color.png)");
 
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
+    Shader lightShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightFS.glsl)");
 
-    //Maze::generateMaze();
+    Maze::generateMaze();
     while (!glfwWindowShouldClose(window)) {
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        showDebugInterface(showDevUI, fpsCamera);
+        showDebugInterface(showDevUI, fpsCamera, deltaTime);
 
         planeShader.use();
 
@@ -89,16 +92,16 @@ int main() {
         // Draw Objects
         drawPlane(planeVAO, planeShader, fpsCamera);
 
-        for (Wall wall : wallVector) {
-            drawWall(wallVAO, planeShader, fpsCamera, wall.getModel());
-        }
+        // Light
+        drawCube(lightCubeVAO, lightShader, fpsCamera, glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.1f, 0.1f, 0.1f));
 
         if (cubePathShown) {
             for (glm::vec3 pos : worldPosDots) {
-                drawDot(dotVAO, dotShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
+                drawCube(dotVAO, lightShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
             }
         }
 
+        // End GUI
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

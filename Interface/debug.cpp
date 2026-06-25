@@ -23,7 +23,7 @@ void interfaceInit(GLFWwindow *window) {
 }
 
 
-void showDebugInterface(bool& showDevUI, Camera &playerCamera) {
+void showDebugInterface(bool& showDevUI, Camera &playerCamera, float deltaTime) {
 
     ImGui::SetNextWindowSize(ImVec2(400, 400));
     if (ImGui::Begin("Dev Mode", &showDevUI)) {
@@ -33,6 +33,10 @@ void showDebugInterface(bool& showDevUI, Camera &playerCamera) {
 
         // Flymode
         ImGui::Checkbox("Fly Mode", &flyMode);
+
+        // Fps
+        std::string fps_string = std::format("Frames Per Sec: {}", 1.0f / deltaTime);
+        ImGui::Text(fps_string.c_str());
 
         // Camera Pos
         std::string pos_vec3_string = std::format("Camera Position: ({}, {}, {})", playerCamera.Position.x, playerCamera.Position.y, playerCamera.Position.z);
