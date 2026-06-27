@@ -24,7 +24,7 @@ const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
-constexpr float PLAYER_RADIUS = 0.2f;
+constexpr float PLAYER_RADIUS = 0.15f;
 
 inline bool flyMode = false;
 
@@ -99,17 +99,16 @@ public:
         glm::vec3 xOnly = glm::vec3(nextPosition.x, Position.y, Position.z);
         glm::vec3 zOnly = glm::vec3(Position.x, Position.y, nextPosition.z);
 
-        if (flyMode) {
-            Position.y = nextPosition.y;
-        } else {
-            Position.y = 0.5f;
-        }
+        flyMode ? Position.y = nextPosition.y : Position.y = 0.5f;
 
-        Position.x = nextPosition.x;
-        Position.z = nextPosition.z;
-        //TODO collision
-        //if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
-        //if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
+        playerTouchingWall = isCameraCollided(Position);
+
+        if (flyMode) {
+            Position = nextPosition;
+        } else {
+            if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
+            if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
+        }
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

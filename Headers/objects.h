@@ -36,10 +36,13 @@ struct Wall {
 inline float dotPosHalfInterval = 0;
 inline float planeSize = 200.0f;
 
+inline bool playerTouchingWall = false;
+
+//TODO ADD Some Thickness
 constexpr float WALL_HALF_THICKNESS = 0.05f;
 
 inline std::vector<glm::vec3> worldPosDots;
-inline std::vector<Wall> wallVector;
+inline std::vector<Wall> currentWallVector;
 
 
 class Camera;
@@ -59,7 +62,6 @@ void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::
 
 std::vector<glm::vec3> getDotsWorldPosVector(int dotNumberOneSided, float planeWidthorLength, glm::vec3 planeBottomRightPoint);
 
-void createWallCollision(float minX, float maxX, float minZ, float maxZ);
 bool isCameraCollided(glm::vec3 playerPos);
 
 #endif //MAZEGAME_OBJECTS_H

@@ -77,15 +77,16 @@ namespace Maze {
         return prevMazeIndices;
     }
 
+    //TODO Very Messy
     std::vector<Wall> generateWalls(const std::vector<arrowIndex>& mazeIndicesVector, const std::vector<glm::vec3>& worldPosDots) {
         std::vector<Wall> wallsVector;
 
         int i = 0;
 
         glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 1.0f, 1.0f);
+        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 4.0f, 1.0f);
 
-
+        // Horizontal
         for (arrowIndex arrowIndex : mazeIndicesVector) {
             if (!arrowIndex.beingPointedFromUp && arrowIndex.zF - arrowIndex.zI <= 0) {
                 position = worldPosDots[i];
@@ -103,7 +104,7 @@ namespace Maze {
             i++;
         }
 
-
+        // Border Horizontal
         for (int bottomI = 0; bottomI < numDotsOnSide; bottomI++) {
             position = worldPosDots[bottomI];
             position.x *= 0.1f;
@@ -119,19 +120,19 @@ namespace Maze {
         }
 
 
-
+        // Vertical
         i = 0;
         for (arrowIndex arrowIndex : mazeIndicesVector) {
             if (!arrowIndex.beingPointedFromRight && arrowIndex.xF - arrowIndex.xI <= 0) {
 
                 position = worldPosDots[i];
-                position.z *= 0.1f; // TODO MAGIC NUMBER
+                position.z *= 0.1f;
                 position.x = (position.x + dotPosHalfInterval) * 0.1f;
 
                 Wall wall{worldPosDots[i].x - dotPosHalfInterval,
-                    worldPosDots[i].x + dotPosHalfInterval,
+                    worldPosDots[i].x - dotPosHalfInterval,
                     worldPosDots[i].z - dotPosHalfInterval,
-                    worldPosDots[i].z - dotPosHalfInterval,
+                    worldPosDots[i].z + dotPosHalfInterval,
                     position, size, glm::vec3(0.0f, 1.0f, 0.0f)};
 
                 wallsVector.push_back(wall);
@@ -140,20 +141,27 @@ namespace Maze {
             i++;
         }
 
+        // Vertical Border
         for (int leftI = 0; leftI < numDotsOnSide; leftI++) {
             position = worldPosDots[leftI * numDotsOnSide];
-            position.z *= 0.1f; // TODO MAGIC NUMBER
+            position.z *= 0.1f;
             position.x = (position.x - dotPosHalfInterval) * 0.1f;
 
             Wall wall{worldPosDots[leftI * numDotsOnSide].x - dotPosHalfInterval,
-                worldPosDots[leftI * numDotsOnSide].x + dotPosHalfInterval,
+                worldPosDots[leftI * numDotsOnSide].x - dotPosHalfInterval,
                 worldPosDots[leftI * numDotsOnSide].z - dotPosHalfInterval,
-                worldPosDots[leftI * numDotsOnSide].z - dotPosHalfInterval,
+                worldPosDots[leftI * numDotsOnSide].z + dotPosHalfInterval,
                 position, size, glm::vec3(0.0f, 1.0f, 0.0f)};
 
             wallsVector.push_back(wall);
         }
 
+        for (auto& wall : wallsVector) {
+            wall.minX /= 10.0f;
+            wall.maxX /= 10.0f;
+            wall.minZ /= 10.0f;
+            wall.maxZ /= 10.0f;
+        }
         return wallsVector;
     }
 
@@ -204,16 +212,7 @@ namespace Maze {
         }
 
         markNodes(currArrowIndices);
-        wallVector = generateWalls(currArrowIndices, worldPosDots);
-
-        // Wall Collisions
-        for (Wall wall : wallVector) {
-            createWallCollision(wall.minX / 10.0f, wall.maxX / 10.0f, wall.minZ / 10.0f, wall.maxZ / 10.0f);
-        }
-
-        for (glm::vec3 pos : worldPosDots) {
-            std::cout << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
-        }
+        currentWallVector = generateWalls(currArrowIndices, worldPosDots);
     }
 
     void markNodes(std::vector<arrowIndex>& mazeIndices) {

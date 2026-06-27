@@ -34,6 +34,10 @@ void showDebugInterface(bool& showDevUI, Camera &playerCamera, float deltaTime) 
         // Flymode
         ImGui::Checkbox("Fly Mode", &flyMode);
 
+        // Collision
+        std::string collision_string = std::format("Collision: {}", playerTouchingWall);
+        ImGui::Text(collision_string.c_str());
+
         // Fps
         std::string fps_string = std::format("Frames Per Sec: {}", 1.0f / deltaTime);
         ImGui::Text(fps_string.c_str());

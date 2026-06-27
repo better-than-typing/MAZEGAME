@@ -257,6 +257,8 @@ void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const
     glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.Zoom), 1280.0f / 800.0f, 0.1f, 100.0f);
     glm::mat4 view = fpsCamera.GetViewMatrix();
 
+    wallShader.setVec3("dotColor", glm::vec3(0.0f, 0.0f, 0.5f));
+
     wallShader.setMat4("projection", projection);
     wallShader.setMat4("view", view);
 
