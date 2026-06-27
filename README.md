@@ -17,7 +17,8 @@ This is my first OpenGL game so it will be pretty ass. It is going to have some 
   
 https://github.com/user-attachments/assets/2fa762e4-db83-4a52-b681-2c9a5513db44
 
--- June 26, 2026: Wall collision finally working. Trying out different graphic/lighting styles.
+
+- June 26, 2026: Wall collision finally working. Trying out different graphic/lighting styles.
 
 https://github.com/user-attachments/assets/8ba10049-b21e-435f-9a80-838700385d98
 
