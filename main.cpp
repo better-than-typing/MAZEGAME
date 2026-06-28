@@ -12,6 +12,7 @@
 #include "Headers/mazegen.h"
 #include "Headers/input.h"
 #include "Headers/debug.h"
+#include "Headers/entity.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
 constexpr unsigned int SCREEN_HEIGHT = 800;
@@ -48,13 +49,38 @@ int main() {
     unsigned int lightCubeVAO = registerCube();
 
     unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\WoodFloor051_4K-PNG\WoodFloor051_4K-PNG_Color.png)");
+    unsigned int wallTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
+    unsigned int entityTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\Entity.png)");
 
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
     Shader lightShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightFS.glsl)");
     Shader wallShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallFS.glsl)");
 
+    unsigned int frameBuffer;
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    unsigned int textureColorbuffer;
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     Maze::generateMaze();
+
+    Entity entityWall{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.5f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), 180.0f, fpsCamera};
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -87,17 +113,15 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.01f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Texture Objects
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, planeTexture);
-
         // Draw Objects
-        drawPlane(planeVAO, planeShader, fpsCamera);
+        drawPlane(planeVAO, planeShader, fpsCamera, planeTexture);
+
+        // Entity
+        drawWall(wallVAO, wallShader, fpsCamera, entityWall.getModel() * entityWall.getViewModel(), entityTexture);
 
         for (Wall wall : currentWallVector) {
-            drawWall(wallVAO, wallShader, fpsCamera, wall.getModel());
+            drawWall(wallVAO, wallShader, fpsCamera, wall.getModel(), wallTexture);
         }
-
 
         if (cubePathShown) {
             for (glm::vec3 pos : worldPosDots) {
@@ -145,6 +169,7 @@ void initWindow() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     setIcon(window);
 }

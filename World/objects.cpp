@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "../Headers/mazegen.h"
-
 // Was 36 floats (6 per vertex, no texcoords). Now 48 (8 per vertex).
 float texSize = planeSize / 10.0f;
 float planeVertices[66] = {
@@ -20,18 +19,18 @@ float planeVertices[66] = {
     -0.5f, 0.0f, -0.5f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f * texSize,           0.0f, 1.0f, 0.0f
 };
 
-float wallVertices[36] = {
+float wallVertices[48] = {
     // first triangle
-    // positions          // colors
-    -0.5f, 0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
-     0.5f, 0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
-     0.5f, 0.5f,  0.0f,  1.0f, 0.0f, 0.0f,
+    // positions          // colors           // texture coords
+    -0.5f,  0.0f,  0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   // bottom-left
+     0.5f,  0.0f,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f,   // bottom-right
+     0.5f,  0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top-right
 
     // second triangle
-    // positions          // colors
-     0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-    -0.5f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f,
+    // positions          // colors           // texture coords
+     0.5f,  0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top-right
+    -0.5f,  0.5f,  0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,   // top-left
+    -0.5f,  0.0f,  0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f    // bottom-left
 };
 
 const static std::vector<float> cubeVertices =
@@ -187,12 +186,16 @@ unsigned int registerWall() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(wallVertices), wallVertices, GL_STATIC_DRAW);
 
     // Position Attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) nullptr);
     glEnableVertexAttribArray(0);
 
     // Color Attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // Texture Attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     return VAO;
 }
@@ -221,7 +224,7 @@ void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::
     glBindVertexArray(0);
 }
 
-void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
+void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture) {
     planeShader.use();
 
     // view/projection transformations
@@ -243,6 +246,9 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
     planeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     planeShader.setVec3("viewPos", fpsCamera.Position);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, planeTexture);
+
     glBindVertexArray(planeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
@@ -250,19 +256,23 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera) {
 
 
 
-void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model) {
+void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model, unsigned int wallTexture) {
     wallShader.use();
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(fpsCamera.Zoom), 1280.0f / 800.0f, 0.1f, 100.0f);
     glm::mat4 view = fpsCamera.GetViewMatrix();
 
-    wallShader.setVec3("dotColor", glm::vec3(0.0f, 0.0f, 0.5f));
-
+    // Vertex Shader
     wallShader.setMat4("projection", projection);
     wallShader.setMat4("view", view);
-
     wallShader.setMat4("model", model);
+
+    // Fragment Shader
+    wallShader.setVec3("wallColor", glm::vec3(0.0f, 0.0f, 0.5f));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, wallTexture);
 
     glBindVertexArray(wallVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -18,13 +18,14 @@ struct Wall {
     // World Pos
     glm::vec3 position;
     glm::vec3 size;
-    glm::vec3 rotation;
+    glm::vec3 rotationAxis;
+    float rotationAngle;
 
-    glm::mat4 getModel() {
+    [[nodiscard]] glm::mat4 getModel() const {
         auto model = glm::translate(glm::mat4(1.0f), position);
 
-        if (rotation != glm::vec3(0.0f, 0.0f, 0.0f)) {
-            model = glm::rotate(model, glm::radians(90.0f), rotation);
+        if (rotationAxis != glm::vec3(0.0f, 0.0f, 0.0f)) {
+            model = glm::rotate(model, glm::radians(rotationAngle), rotationAxis);
         }
 
         model = glm::scale(model, size);
@@ -51,11 +52,10 @@ unsigned int loadTexture(char const* path);
 void setIcon(GLFWwindow* window);
 
 unsigned int registerPlane();  // returns VAO so it can be reused
-void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera);
+void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture);
 
 unsigned int registerWall();
-// void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera);
-void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model);
+void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model, unsigned int wallTexture);
 
 unsigned int registerCube();
 void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::vec3 worldPos, glm::vec3 sizeVec);

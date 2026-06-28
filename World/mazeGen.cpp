@@ -97,7 +97,7 @@ namespace Maze {
                     worldPosDots[i].x + dotPosHalfInterval,
                     worldPosDots[i].z - dotPosHalfInterval,
                     worldPosDots[i].z - dotPosHalfInterval,
-                    position, size, glm::vec3(0.0f, 0.0f, 0.0f)};
+                    position, size, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f};
 
                 wallsVector.push_back(wall);
             }
@@ -114,7 +114,7 @@ namespace Maze {
                 worldPosDots[bottomI].x + dotPosHalfInterval,
                 worldPosDots[bottomI].z - dotPosHalfInterval,
                 worldPosDots[bottomI].z - dotPosHalfInterval,
-                position, size, glm::vec3(0.0f, 0.0f, 0.0f)};
+                position, size, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f};
 
             wallsVector.push_back(wall);
         }
@@ -133,7 +133,7 @@ namespace Maze {
                     worldPosDots[i].x - dotPosHalfInterval,
                     worldPosDots[i].z - dotPosHalfInterval,
                     worldPosDots[i].z + dotPosHalfInterval,
-                    position, size, glm::vec3(0.0f, 1.0f, 0.0f)};
+                    position, size, glm::vec3(0.0f, 1.0f, 0.0f), 90.0f};
 
                 wallsVector.push_back(wall);
             }
@@ -151,7 +151,7 @@ namespace Maze {
                 worldPosDots[leftI * numDotsOnSide].x - dotPosHalfInterval,
                 worldPosDots[leftI * numDotsOnSide].z - dotPosHalfInterval,
                 worldPosDots[leftI * numDotsOnSide].z + dotPosHalfInterval,
-                position, size, glm::vec3(0.0f, 1.0f, 0.0f)};
+                position, size, glm::vec3(0.0f, 1.0f, 0.0f), 90.0f};
 
             wallsVector.push_back(wall);
         }
