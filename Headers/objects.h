@@ -35,12 +35,11 @@ struct Wall {
 };
 
 inline float dotPosHalfInterval = 0;
-inline float planeSize = 200.0f;
+inline float planeSize = 300.0f;
 
 inline bool playerTouchingWall = false;
 
-//TODO ADD Some Thickness
-constexpr float WALL_HALF_THICKNESS = 0.05f;
+
 
 inline std::vector<glm::vec3> worldPosDots;
 inline std::vector<Wall> currentWallVector;

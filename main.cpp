@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <random>
 
 #include "External Headers/imgui.h"
 #include "External Headers/imgui_impl_glfw.h"
@@ -13,6 +14,7 @@
 #include "Headers/input.h"
 #include "Headers/debug.h"
 #include "Headers/entity.h"
+#include "Headers/post_processing.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
 constexpr unsigned int SCREEN_HEIGHT = 800;
@@ -39,24 +41,31 @@ glm::vec3 wallPos1;
 
 int main() {
 
+    // Init window and UI
     initWindow();
     interfaceInit(window);
 
+    // VAOs init
     unsigned int planeVAO = registerPlane();
     unsigned int wallVAO = registerWall();
     unsigned int dotVAO = registerCube();
-
+    unsigned int screenQuadVAO = registerScreenQuad();
     unsigned int lightCubeVAO = registerCube();
 
+    // Textures init
     unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\WoodFloor051_4K-PNG\WoodFloor051_4K-PNG_Color.png)");
     unsigned int wallTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
     unsigned int entityTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\Entity.png)");
 
+    // Shaders init
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
     Shader lightShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightFS.glsl)");
     Shader wallShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallFS.glsl)");
+    Shader wallExitShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallExitFs.glsl)");
+    Shader screenShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenFS_entityFlash.glsl)");
 
+    // Frame Buffer Init
     unsigned int frameBuffer;
     glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -64,23 +73,60 @@ int main() {
     unsigned int textureColorbuffer;
     glGenTextures(1, &textureColorbuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
 
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH,SCREEN_HEIGHT);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // World Generation init
     Maze::generateMaze();
 
     Entity entityWall{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.5f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), 180.0f, fpsCamera};
+
+    float maxBorderPos = 0;
+    for (const auto& borderPos : currentWallVector) {
+        if (borderPos.position.x > maxBorderPos) {
+            maxBorderPos = borderPos.position.x;
+        }
+        if (borderPos.position.z > maxBorderPos) {
+            maxBorderPos = borderPos.position.z;
+        }
+    }
+
+    maxBorderPos = std::floor(maxBorderPos);
+
+    std::cout << "Max Border Pos Float (Floored): " << maxBorderPos << std::endl;
+
+    int numBorderWall = 0;
+    std::vector<int> borderWallIndices;
+    for (const auto& wall : currentWallVector) {
+        if (std::floor(abs(wall.position.x)) == maxBorderPos || std::floor(abs(wall.position.z)) == maxBorderPos) {
+            borderWallIndices.push_back(numBorderWall);
+        }
+
+        numBorderWall++;
+    }
+    std::sort(borderWallIndices.begin(), borderWallIndices.end());
+
+    std::cout << currentWallVector.size() << " down to " << borderWallIndices.size() << std::endl;
+
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distrib(0, static_cast<int>(borderWallIndices.size()));
+
+    int randomIndex = distrib(gen);
+    int exitWallIndex = borderWallIndices[randomIndex];
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -89,8 +135,6 @@ int main() {
         ImGui::NewFrame();
 
         showDebugInterface(showDevUI, fpsCamera, deltaTime);
-
-        planeShader.use();
 
         // Frame Handling
         auto currentFrame = static_cast<float>(glfwGetTime());
@@ -101,6 +145,10 @@ int main() {
         processInput(window);
         togglePathCubes(window);
         toggleCursor(window);
+
+        // Frame Buffer
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        glEnable(GL_DEPTH_TEST);
 
         // Debug
         if (showWireframe) {
@@ -119,8 +167,15 @@ int main() {
         // Entity
         drawWall(wallVAO, wallShader, fpsCamera, entityWall.getModel() * entityWall.getViewModel(), entityTexture);
 
+        int i = 0;
         for (Wall wall : currentWallVector) {
-            drawWall(wallVAO, wallShader, fpsCamera, wall.getModel(), wallTexture);
+
+            if (i == exitWallIndex) {
+                drawWall(wallVAO, wallExitShader, fpsCamera, wall.getModel(), wallTexture);
+            } else {
+                drawWall(wallVAO, wallShader, fpsCamera, wall.getModel(), wallTexture);
+            }
+            i++;
         }
 
         if (cubePathShown) {
@@ -128,6 +183,30 @@ int main() {
                 drawCube(dotVAO, lightShader, fpsCamera, glm::vec3(pos.x * 0.1f, 0.125f, pos.z * 0.1f), glm::vec3(0.25f, 0.25f, 0.25f));
             }
         }
+
+        // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        // clear all relevant buffers
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // after screenShader.use(), once at startup (optional safety)
+        // screenShader.setFloat("triggerTime", -1000.0f);
+
+        // in the render loop, replacing your current block:
+
+
+        screenShader.use();
+        screenShader.setFloat("time", glfwGetTime());
+        if (!playerTouchingWall) {
+            //screenShader.setFloat("triggerTime", glfwGetTime());
+        }
+
+        //screenShader.setFloat("glitchIntensity", 0.9f); // 0.0–1.0
+        glBindVertexArray(screenQuadVAO);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // End GUI
         ImGui::Render();

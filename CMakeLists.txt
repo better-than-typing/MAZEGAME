@@ -32,6 +32,8 @@ add_executable(MAZEGAME main.cpp
         "External Headers/imgui_impl_opengl3.cpp"
         "External Headers/imgui_internal.h"
         Headers/entity.h
+        Headers/post_processing.h
+        post_processing.cpp
 )
 
 target_link_libraries(MAZEGAME PRIVATE
