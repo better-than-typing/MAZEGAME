@@ -93,40 +93,7 @@ int main() {
 
     Entity entityWall{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.5f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), 180.0f, fpsCamera};
 
-    float maxBorderPos = 0;
-    for (const auto& borderPos : currentWallVector) {
-        if (borderPos.position.x > maxBorderPos) {
-            maxBorderPos = borderPos.position.x;
-        }
-        if (borderPos.position.z > maxBorderPos) {
-            maxBorderPos = borderPos.position.z;
-        }
-    }
-
-    maxBorderPos = std::floor(maxBorderPos);
-
-    std::cout << "Max Border Pos Float (Floored): " << maxBorderPos << std::endl;
-
-    int numBorderWall = 0;
-    std::vector<int> borderWallIndices;
-    for (const auto& wall : currentWallVector) {
-        if (std::floor(abs(wall.position.x)) == maxBorderPos || std::floor(abs(wall.position.z)) == maxBorderPos) {
-            borderWallIndices.push_back(numBorderWall);
-        }
-
-        numBorderWall++;
-    }
-    std::sort(borderWallIndices.begin(), borderWallIndices.end());
-
-    std::cout << currentWallVector.size() << " down to " << borderWallIndices.size() << std::endl;
-
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> distrib(0, static_cast<int>(borderWallIndices.size()));
-
-    int randomIndex = distrib(gen);
-    int exitWallIndex = borderWallIndices[randomIndex];
+    int exitWallIndex = getExitWallIndex();
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -184,6 +151,11 @@ int main() {
             }
         }
 
+        if (isPlayerAtExit(exitWallIndex)) {
+            std::cout << "Yes King";
+            break;
+        }
+
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
@@ -199,9 +171,9 @@ int main() {
 
         screenShader.use();
         screenShader.setFloat("time", glfwGetTime());
-        if (!playerTouchingWall) {
-            //screenShader.setFloat("triggerTime", glfwGetTime());
-        }
+
+        //screenShader.setFloat("triggerTime", glfwGetTime());
+
 
         //screenShader.setFloat("glitchIntensity", 0.9f); // 0.0–1.0
         glBindVertexArray(screenQuadVAO);

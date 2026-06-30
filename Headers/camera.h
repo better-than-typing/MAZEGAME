@@ -101,14 +101,17 @@ public:
 
         flyMode ? Position.y = nextPosition.y : Position.y = 0.5f;
 
-        playerTouchingWall = isCameraCollided(Position);
-
         if (flyMode) {
             Position = nextPosition;
+            MovementSpeed = SPEED * 3.0f;
         } else {
-            if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
-            if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
+            MovementSpeed = SPEED;
         }
+
+        if (!isCameraCollided(xOnly)) Position.x = nextPosition.x;
+        if (!isCameraCollided(zOnly)) Position.z = nextPosition.z;
+
+        isCameraCollided(nextPosition);
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

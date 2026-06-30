@@ -35,10 +35,11 @@ struct Wall {
 };
 
 inline float dotPosHalfInterval = 0;
-inline float planeSize = 300.0f;
+inline float planeSize = 500.0f;
 
-inline bool playerTouchingWall = false;
+inline bool playerTouchingExitWall = false;
 
+inline int playerTouchingWallIndex = -1;
 
 
 inline std::vector<glm::vec3> worldPosDots;
@@ -62,5 +63,9 @@ void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::
 std::vector<glm::vec3> getDotsWorldPosVector(int dotNumberOneSided, float planeWidthorLength, glm::vec3 planeBottomRightPoint);
 
 bool isCameraCollided(glm::vec3 playerPos);
+bool getCollisionIndex(glm::vec3 playerPos);
+bool isPlayerAtExit(int exitWallIndex);
+
+int getExitWallIndex();
 
 #endif //MAZEGAME_OBJECTS_H

@@ -84,7 +84,7 @@ namespace Maze {
         int i = 0;
 
         glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 4.0f, 1.0f);
+        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 2.5f, 1.0f);
 
         // Horizontal
         for (arrowIndex arrowIndex : mazeIndicesVector) {
