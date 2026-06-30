@@ -47,21 +47,6 @@ namespace Maze {
         int index = currentOrigin.x + currentOrigin.z * numDotsOnSide;
         int removedIndex = nextOrigin.x + nextOrigin.z * numDotsOnSide;
 
-        //std::cout << "Index: " << index << std::endl;
-
-        /**
-        for (int i = 0; i < prevMazeIndices.size(); i++) {
-            std::cout << "vector[" << i << "]: ";
-
-            std::string s1 = std::format("({0}, {1})", prevMazeIndices[i].xI,  prevMazeIndices[i].yI);
-            std::string s2 = std::format("({0}, {1})", prevMazeIndices[i].xF,  prevMazeIndices[i].yF);
-
-            std::cout << s1 << " -> " << s2 << std::endl;
-        }
-        **/
-
-        //std::string origin1 = std::format("{0} , {1}", currOrigin.x, currOrigin)
-
         prevMazeIndices[index].xF = nextOrigin.x;
         prevMazeIndices[index].zF = nextOrigin.z;
 
@@ -83,8 +68,8 @@ namespace Maze {
 
         int i = 0;
 
-        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, 2.5f, 1.0f);
+        glm::vec3 position;
+        glm::vec3 size = glm::vec3(dotPosHalfInterval * 2 * 0.1f, wallHeight, 1.0f);
 
         // Horizontal
         for (arrowIndex arrowIndex : mazeIndicesVector) {

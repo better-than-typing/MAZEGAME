@@ -13,7 +13,6 @@
 #include "Headers/mazegen.h"
 #include "Headers/input.h"
 #include "Headers/debug.h"
-#include "Headers/entity.h"
 #include "Headers/post_processing.h"
 
 constexpr unsigned int SCREEN_WIDTH = 1280;
@@ -53,17 +52,18 @@ int main() {
     unsigned int lightCubeVAO = registerCube();
 
     // Textures init
-    unsigned int planeTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\WoodFloor051_4K-PNG\WoodFloor051_4K-PNG_Color.png)");
+    unsigned int groundTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\floor_wood_planks.png)");
+    unsigned int roofTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\floor_stone_sand_random.png)");
     unsigned int wallTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
-    unsigned int entityTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\Entity.png)");
 
     // Shaders init
     Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
+    Shader roofShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Roof\roofVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Roof\roofFS.glsl)");
     Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
     Shader lightShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightFS.glsl)");
     Shader wallShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallFS.glsl)");
     Shader wallExitShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallExitFs.glsl)");
-    Shader screenShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenFS_entityFlash.glsl)");
+    Shader screenShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenFS.glsl)");
 
     // Frame Buffer Init
     unsigned int frameBuffer;
@@ -90,8 +90,6 @@ int main() {
 
     // World Generation init
     Maze::generateMaze();
-
-    Entity entityWall{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.5f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), 180.0f, fpsCamera};
 
     int exitWallIndex = getExitWallIndex();
 
@@ -129,10 +127,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw Objects
-        drawPlane(planeVAO, planeShader, fpsCamera, planeTexture);
-
-        // Entity
-        drawWall(wallVAO, wallShader, fpsCamera, entityWall.getModel() * entityWall.getViewModel(), entityTexture);
+        drawPlane(planeVAO, roofShader, fpsCamera, roofTexture, glm::vec3(0.0f, 1.2f, 0.0f), true);
+        drawPlane(planeVAO, planeShader, fpsCamera, groundTexture, glm::vec3(0.0f, 0.0f, 0.0f), false);
 
         int i = 0;
         for (Wall wall : currentWallVector) {
@@ -163,19 +159,13 @@ int main() {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // after screenShader.use(), once at startup (optional safety)
-        // screenShader.setFloat("triggerTime", -1000.0f);
 
-        // in the render loop, replacing your current block:
 
 
         screenShader.use();
         screenShader.setFloat("time", glfwGetTime());
+        screenShader.setFloat("glitchIntensity", 0.5f);
 
-        //screenShader.setFloat("triggerTime", glfwGetTime());
-
-
-        //screenShader.setFloat("glitchIntensity", 0.9f); // 0.0–1.0
         glBindVertexArray(screenQuadVAO);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -41,6 +41,7 @@ inline bool playerTouchingExitWall = false;
 
 inline int playerTouchingWallIndex = -1;
 
+inline float wallHeight = 2.5f;
 
 inline std::vector<glm::vec3> worldPosDots;
 inline std::vector<Wall> currentWallVector;
@@ -52,7 +53,7 @@ unsigned int loadTexture(char const* path);
 void setIcon(GLFWwindow* window);
 
 unsigned int registerPlane();  // returns VAO so it can be reused
-void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture);
+void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture, glm::vec3 worldPos, bool isRoof);
 
 unsigned int registerWall();
 void drawWall(unsigned int wallVAO, Shader& wallShader, Camera& fpsCamera, const glm::mat4& model, unsigned int wallTexture);

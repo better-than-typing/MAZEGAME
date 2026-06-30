@@ -224,7 +224,7 @@ void drawCube(unsigned int cubeVAO, Shader& cubeShader, Camera& fpsCamera, glm::
     glBindVertexArray(0);
 }
 
-void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture) {
+void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture, glm::vec3 worldPos, bool isRoof) {
     planeShader.use();
 
     // view/projection transformations
@@ -238,13 +238,16 @@ void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, un
     // world transformation
     glm::vec3 scale = glm::vec3(planeSize / 8.0f, 1.0f, planeSize / 8.0f);
     glm::mat4 model = glm::scale(glm::mat4(1.0f), scale);
+    model = glm::translate(model, worldPos);
 
     planeShader.setMat4("model", model);
 
-    //TODO MAGIC NUMBER
-    planeShader.setVec3("lightPos", glm::vec3(0.0f, 0.5f, 0.0f));
-    planeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    planeShader.setVec3("viewPos", fpsCamera.Position);
+    if (!isRoof) {
+        planeShader.setVec3("lightPos", glm::vec3(0.0f, 0.5f, 0.0f));
+        planeShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        planeShader.setVec3("viewPos", fpsCamera.Position);
+    }
+
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, planeTexture);
