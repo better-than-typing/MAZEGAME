@@ -2,7 +2,7 @@
 # Maze Game
 
 This is my first month long
- OpenGL game.Your goal is to find the exit.
+ OpenGL game. Your goal is to find the exit.
 
 ## Procedure Generated Maze
 - Orgin Shift Algorithm (Source: https://www.youtube.com/watch?v=zbXKcDVV4G0&t=252s&pp=ygUPbWF6ZSBnZW5lcmF0aW9u0gcJCTgLAYcqIYzv)
