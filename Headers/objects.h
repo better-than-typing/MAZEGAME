@@ -50,7 +50,7 @@ inline std::vector<Wall> currentWallVector;
 class Camera;
 
 unsigned int loadTexture(char const* path);
-void setIcon(GLFWwindow* window);
+void setIcon(GLFWwindow* window, char const* stringPath);
 
 unsigned int registerPlane();  // returns VAO so it can be reused
 void drawPlane(unsigned int planeVAO, Shader& planeShader, Camera& fpsCamera, unsigned int planeTexture, glm::vec3 worldPos, bool isRoof);

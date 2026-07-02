@@ -9,6 +9,7 @@
 #include "../External Headers/imgui_impl_opengl3.h"
 
 
+
 void interfaceInit(GLFWwindow *window) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -46,9 +47,22 @@ void showDebugInterface(bool& showDevUI, Camera &playerCamera, float deltaTime) 
         std::string pos_vec3_string = std::format("Camera Position: ({}, {}, {})", playerCamera.Position.x, playerCamera.Position.y, playerCamera.Position.z);
         ImGui::Text(pos_vec3_string.c_str());
 
+        // Next Position
+        std::string nextPosition_string = std::format("Next Position: ({}, {}, {})", playerCamera.nextPosition.x, playerCamera.nextPosition.y, playerCamera.nextPosition.z);
+        ImGui::Text(nextPosition_string.c_str());
+
         // Camera Look Vector
         std::string look_vec3_string = std::format("Look Vector: ({}, {}, {})", playerCamera.Front.x, playerCamera.Front.y, playerCamera.Front.z);
         ImGui::Text(look_vec3_string.c_str());
+
+        // Camera View Bobbing
+        std::string bobbing_string = std::format("View Bobbing: {}", playerCamera.viewBobbingValue);
+        ImGui::Text(bobbing_string.c_str());
+
+        //Velocity
+        std::string velocity_string = std::format("Velocity: {}", playerCamera.velocity);
+        ImGui::Text(velocity_string.c_str());
+
 
     }
 

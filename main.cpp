@@ -34,9 +34,11 @@ void initWindow();
 void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void processInput(GLFWwindow *window);
 
-//TODO Make the GRID SIZE proportional to wall size or length
-glm::vec3 wallSize;
-glm::vec3 wallPos1;
+#include <string>
+
+inline std::string assetPath(const std::string& relative) {
+    return std::string(ROOT_DIR) + "/" + relative;
+}
 
 int main() {
 
@@ -51,19 +53,19 @@ int main() {
     unsigned int screenQuadVAO = registerScreenQuad();
     unsigned int lightCubeVAO = registerCube();
 
-    // Textures init
-    unsigned int groundTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\floor_wood_planks.png)");
-    unsigned int roofTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\floor_stone_sand_random.png)");
-    unsigned int wallTexture = loadTexture(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Assets\planeTexture.png)");
+    // Textures
+    unsigned int groundTexture = loadTexture(assetPath("Assets/floor_wood_planks.png").c_str());
+    unsigned int roofTexture   = loadTexture(assetPath("Assets/floor_stone_sand_random.png").c_str());
+    unsigned int wallTexture   = loadTexture(assetPath("Assets/planeTexture.png").c_str());
 
-    // Shaders init
-    Shader planeShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Plane\planeFS.glsl)");
-    Shader roofShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Roof\roofVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Roof\roofFS.glsl)");
-    Shader dotShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Dot\dotFS.glsl)");
-    Shader lightShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Light\lightFS.glsl)");
-    Shader wallShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallFS.glsl)");
-    Shader wallExitShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Wall\wallExitFs.glsl)");
-    Shader screenShader(R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenVS.glsl)", R"(C:\Users\EyesightsX\CLionProjects\MazeGame\Shaders\Screen\screenFS.glsl)");
+    // Shaders
+    Shader planeShader(assetPath("Shaders/Plane/planeVS.glsl").c_str(), assetPath("Shaders/Plane/planeFS.glsl").c_str());
+    Shader roofShader(assetPath("Shaders/Roof/roofVS.glsl").c_str(),   assetPath("Shaders/Roof/roofFS.glsl").c_str());
+    Shader dotShader(assetPath("Shaders/Dot/dotVS.glsl").c_str(),     assetPath("Shaders/Dot/dotFS.glsl").c_str());
+    Shader lightShader(assetPath("Shaders/Light/lightVS.glsl").c_str(), assetPath("Shaders/Light/lightFS.glsl").c_str());
+    Shader wallShader(assetPath("Shaders/Wall/wallVS.glsl").c_str(),   assetPath("Shaders/Wall/wallFS.glsl").c_str());
+    Shader wallExitShader(assetPath("Shaders/Wall/wallVS.glsl").c_str(), assetPath("Shaders/Wall/wallExitFs.glsl").c_str());
+    Shader screenShader(assetPath("Shaders/Screen/screenVS.glsl").c_str(), assetPath("Shaders/Screen/screenFS.glsl").c_str());
 
     // Frame Buffer Init
     unsigned int frameBuffer;
@@ -99,7 +101,7 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        showDebugInterface(showDevUI, fpsCamera, deltaTime);
+        //showDebugInterface(showDevUI, fpsCamera, deltaTime);
 
         // Frame Handling
         auto currentFrame = static_cast<float>(glfwGetTime());
@@ -148,7 +150,6 @@ int main() {
         }
 
         if (isPlayerAtExit(exitWallIndex)) {
-            std::cout << "Yes King";
             break;
         }
 
@@ -158,9 +159,6 @@ int main() {
         // clear all relevant buffers
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
         glClear(GL_COLOR_BUFFER_BIT);
-
-
-
 
         screenShader.use();
         screenShader.setFloat("time", glfwGetTime());
@@ -212,7 +210,7 @@ void initWindow() {
     glDepthFunc(GL_LESS);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    setIcon(window);
+    setIcon(window, assetPath("Assets/Pfp.png").c_str());
 }
 
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {

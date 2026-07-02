@@ -59,7 +59,7 @@ int getExitWallIndex() {
 
     maxBorderPos = std::floor(maxBorderPos);
 
-    std::cout << "Max Border Pos Float (Floored): " << maxBorderPos << std::endl;
+    //std::cout << "Max Border Pos Float (Floored): " << maxBorderPos << std::endl;
 
     int numBorderWall = 0;
     std::vector<int> borderWallIndicesVector;
@@ -72,7 +72,7 @@ int getExitWallIndex() {
     }
     std::sort(borderWallIndicesVector.begin(), borderWallIndicesVector.end());
 
-    std::cout << currentWallVector.size() << " down to " << borderWallIndicesVector.size() << std::endl;
+    //std::cout << currentWallVector.size() << " down to " << borderWallIndicesVector.size() << std::endl;
 
 
     std::random_device rd;

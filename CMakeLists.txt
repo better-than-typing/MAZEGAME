@@ -12,13 +12,10 @@ add_executable(MAZEGAME main.cpp
         Headers/objects.h
         World/objects.cpp
         World/collisions.cpp
-        "External Headers/stb_image.cpp"
         World/textures.cpp
-        Headers/mazegen.h
         Headers/mazegen.h
         World/mazeGen.cpp
         Headers/input.h
-        Player/input.cpp
         Player/input.cpp
         Interface/debug.cpp
         Headers/debug.h
@@ -34,6 +31,8 @@ add_executable(MAZEGAME main.cpp
         Headers/post_processing.h
         post_processing.cpp
 )
+
+target_compile_definitions(MAZEGAME PRIVATE ROOT_DIR="${CMAKE_SOURCE_DIR}")
 
 target_link_libraries(MAZEGAME PRIVATE
         glfw
