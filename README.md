@@ -11,7 +11,7 @@ This is my first month long
 - Should run on most devices.
 
 ## Progress
-- June 22, 2026: Fully randomized maze generation using Origin Shift. Go check my other project called MAZE-GAME-2D for more details on how it works.
+- June 22, 2026: Fully randomized maze generation using Origin Shift. Go check my other project called 2D-Maze-Generation for more details on how it works.
   
 https://github.com/user-attachments/assets/2fa762e4-db83-4a52-b681-2c9a5513db44
 
